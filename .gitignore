@@ -1,0 +1,18 @@
+# Minimal .gitignore for galaxy morphology analysis
+# Only covers files generated when running the code locally
+
+# Python runtime files
+__pycache__/
+*.pyc
+
+# Output directories created by your scripts
+results/
+plots/
+
+# Analysis output files
+*.csv
+*.png
+*.txt
+
+# Large data files (if you test with any)
+*.hdf5
