@@ -5,6 +5,9 @@
 __pycache__/
 *.pyc
 
+# Virtual environment created by setup script
+galaxy_morphology/
+
 # Output directories created by your scripts
 results/
 plots/
@@ -13,6 +16,9 @@ plots/
 *.csv
 *.png
 *.txt
+
+# Log files created by bash scripts
+*.log
 
 # Large data files (if you test with any)
 *.hdf5
