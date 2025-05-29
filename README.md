@@ -10,10 +10,29 @@ A comprehensive Python toolkit for analyzing galaxy morphology using Bayesian MC
 - **Publication-Quality Visualizations**: Generates corner plots, contour maps, and statistical summaries
 - **Comprehensive Output**: CSV exports, statistical analysis, and human-readable reports
 - **Modular Design**: Clean, well-documented codebase following best practices
+- **Automated Setup**: Bash scripts for easy environment management and analysis execution
 
 ## Installation
 
-### Prerequisites
+### Quick Setup (Recommended)
+
+```bash
+# Clone the repository
+git clone https://github.com/agoater/galaxy-morphology-mcmc.git
+cd galaxy-morphology-mcmc
+
+# Make scripts executable
+chmod +x *.sh
+
+# Set up environment automatically
+./setup_environment.sh
+```
+
+This will create a virtual environment, install all dependencies, and validate the installation.
+
+### Manual Installation
+
+If you prefer manual setup:
 
 ```bash
 # Core scientific computing
@@ -22,21 +41,29 @@ pip install numpy matplotlib scipy
 # MCMC and visualization
 pip install emcee corner
 
-# Simulation data handling (install as needed for your data format)
-pip install pynbody  # For simulation snapshots
-pip install tangos   # For halo database queries
-```
+# Simulation data handling
+pip install pynbody tangos
 
-### Clone Repository
-
-```bash
-git clone https://github.com/agoater/phd/galaxy-morphology-mcmc.git
-cd galaxy-morphology-mcmc
+# Development tools
+pip install pytest
 ```
 
 ## Quick Start
 
-### Basic Usage
+### Using Bash Scripts (Recommended)
+
+```bash
+# Set up environment (first time only)
+./setup_environment.sh
+
+# Run analysis
+./run_analysis.sh -s /path/to/simulation/snapshot -h your_halo_identifier
+
+# Get help on available options
+./run_analysis.sh --help
+```
+
+### Direct Python Usage
 
 ```python
 from main import main
@@ -51,26 +78,39 @@ main(
 )
 ```
 
-### Configuration-Based Usage
+## Command Line Interface
 
-```python
-from config import create_config
-from main import main
+### Environment Setup Script
 
-# Create custom configuration
-config = create_config(
-    snapshot_path='/path/to/snapshot',
-    halo_name='halo_12345',
-    e_initial=0.3,          # Initial ellipticity guess
-    theta_initial=45,       # Initial position angle (degrees)
-    rh_initial=2.0,         # Initial half-light radius (kpc)
-    SB_lim=28.0,           # Surface brightness cut (mag/arcsec²)
-    N=50,                  # Number of rotations
-    random_seed=42         # For reproducibility
-)
+```bash
+./setup_environment.sh [COMMAND]
 
-# Run analysis
-main()  # Uses config defaults
+Commands:
+  install    Set up virtual environment (default)
+  validate   Check if environment works
+  clean      Remove environment
+  help       Show help
+```
+
+### Analysis Runner Script
+
+```bash
+./run_analysis.sh -s SNAPSHOT -h HALO [OPTIONS]
+
+Required:
+  -s, --snapshot PATH     Snapshot file path
+  -h, --halo NAME         Halo name
+
+Optional:
+  -n, --rotations NUM     Number of rotations (default: 50)
+  -w, --walkers NUM       MCMC walkers (default: 50)
+  -p, --production NUM    Production steps (default: 1000)
+  -o, --output DIR        Output directory
+  --help                 Show help
+
+Examples:
+  ./run_analysis.sh -s /data/snap.hdf5 -h halo_001
+  ./run_analysis.sh -s /data/snap.hdf5 -h halo_001 -n 100 -p 2000
 ```
 
 ## Methodology
@@ -128,6 +168,11 @@ Three primary parameters are fitted:
 - **`visualisation.py`**: Publication-quality plot generation
 - **`main.py`**: Analysis pipeline orchestration
 
+### Automation Scripts
+
+- **`setup_environment.sh`**: Automated environment setup and dependency installation
+- **`run_analysis.sh`**: Command-line interface for running analyses with validation
+
 ### Key Classes
 
 ```python
@@ -168,20 +213,23 @@ visualizer.plot_corner(samples, best_params, rotation_idx)
 
 ## Examples
 
-### Analyzing Multiple Halos
+### Command Line Examples
 
-```python
-halo_list = ['halo_001', 'halo_002', 'halo_003']
-snapshot_path = '/data/simulation_snapshot.hdf5'
+```bash
+# Basic analysis
+./run_analysis.sh -s /path/to/simulation/snapshot -h your_halo_identifier
 
-for halo_name in halo_list:
-    print(f"Analyzing {halo_name}...")
-    main(snapshot_path, halo_name, N=100, production_steps=2000)
+# High-precision analysis
+./run_analysis.sh -s /path/to/simulation/snapshot -h your_halo_identifier -n 100 -p 2000
+
+# Custom output directory
+./run_analysis.sh -s /path/to/simulation/snapshot -h your_halo_identidier -o my_results
 ```
 
-### Custom Surface Brightness Analysis
+### Python Examples
 
 ```python
+# Custom surface brightness analysis
 from utils import calculate_surface_brightness, create_meshgrid
 
 # Create surface brightness map
@@ -189,9 +237,8 @@ xx, yy = create_meshgrid(x_coords, y_coords, n_points=1000)
 sb_map = calculate_surface_brightness(xx, yy, e=0.3, theta=45, rh=2.5, vlum=1e10)
 ```
 
-### Statistical Analysis
-
 ```python
+# Statistical analysis
 from results_handler import ResultsHandler
 
 handler = ResultsHandler(config)
@@ -205,18 +252,27 @@ handler.save_mcmc_chains(all_results, thin_factor=10)
 - **Memory Efficiency**: Processes rotations independently to minimize memory usage
 - **Scalability**: Handles datasets with 10⁵-10⁶ stellar particles efficiently
 - **Progress Tracking**: Provides real-time feedback during long analyses
-
-## Scientific Applications
-
-This toolkit is designed for:
-- **Galaxy Evolution Studies**: Tracking morphological changes across cosmic time
-- **Simulation Validation**: Comparing simulated galaxy shapes with observations
-- **Environmental Effects**: Analyzing morphology dependence on galaxy environment
-- **Statistical Samples**: Processing large galaxy catalogs for population studies
+- **Environment Isolation**: Virtual environment prevents dependency conflicts
 
 ## Troubleshooting
 
-### Common Issues
+### Environment Issues
+
+**Installation Problems**:
+```bash
+# Clean and reinstall environment
+./setup_environment.sh clean
+./setup_environment.sh install
+
+# Validate installation
+./setup_environment.sh validate
+```
+
+**Python Import Errors**:
+- Ensure virtual environment is activated: `source galaxy_morphology/bin/activate`
+- Check if all modules installed: `./setup_environment.sh validate`
+
+### Analysis Issues
 
 **MCMC Convergence Problems**:
 - Increase `burn_in_steps` and `production_steps`
@@ -233,14 +289,20 @@ This toolkit is designed for:
 - Check stellar particle selection criteria
 - Verify V-band magnitude calculations
 
+**File Not Found Errors**:
+- Check snapshot file path is correct
+- Ensure halo name exists in tangos database
+- Verify file permissions and accessibility
+
 ## Contributing
 
 Contributions are welcome! Please:
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature-name`)
 3. Add tests for new functionality
-4. Ensure all tests pass
-5. Submit a pull request
+4. Ensure all tests pass (`pytest`)
+5. Test bash scripts work correctly
+6. Submit a pull request
 
 ## Acknowledgments
 
@@ -248,3 +310,5 @@ Contributions are welcome! Please:
 - Uses [corner](https://corner.readthedocs.io/) for parameter visualization
 - Simulation handling via [pynbody](https://pynbody.github.io/) and [tangos](https://tangos.readthedocs.io/)
 - Inspired by observational galaxy morphology studies
+
+---
