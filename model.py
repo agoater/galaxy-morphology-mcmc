@@ -159,41 +159,33 @@ class MCMCModel:
             RuntimeError: If MCMC sampling encounters numerical issues
         """
         try:
-            x, y, mstar, Nstar, stellar_mass = data
+            x, y, mstar, Nstar, stellar_mass = data        
             ndim = len(initial_params)
 
-            # Initialize walker positions near initial guess
-            # Small perturbations prevent walkers from starting identically
             perturbation = 1e-3 * np.random.randn(self.config.nwalkers, ndim)
-            p0 = np.array(initial_params) + perturbation
-            
-            # Ensure all initial positions satisfy priors
-            for i in range(self.config.nwalkers):
-                while self.lnprior(p0[i]) == -np.inf:
-                    p0[i] = np.array(initial_params) + 1e-3 * np.random.randn(ndim)
+            p0 = np.array(initial_params, dtype=float) + perturbation
 
-            # Create ensemble sampler
+            for i in range(self.config.nwalkers):
+                while not np.isfinite(self.lnprior(p0[i])):
+                    p0[i] = np.array(initial_params, dtype=float) + 1e-3 * np.random.randn(ndim)
+
             sampler = emcee.EnsembleSampler(
                 self.config.nwalkers,
                 ndim,
                 self.lnprob,
-                args=(x, y, mstar, Nstar, stellar_mass)
-            )
+                args=(x, y, mstar, Nstar, stellar_mass),
+                )
 
-            # Burn-in phase: equilibration
             if verbose:
                 print(f"Running burn-in for {self.config.burn_in_steps} steps...")
-            sampler.run_mcmc(p0, self.config.burn_in_steps, progress=verbose)
-            
-            # Reset sampler to discard burn-in samples
+            state = sampler.run_mcmc(p0, self.config.burn_in_steps, progress=verbose)
+
             sampler.reset()
 
-            # Production phase: parameter estimation
             if verbose:
                 print(f"Running production for {self.config.production_steps} steps...")
-            sampler.run_mcmc(p0, self.config.production_steps, progress=verbose)
+            sampler.run_mcmc(state, self.config.production_steps, progress=verbose)
 
-            # Check convergence (basic diagnostic)
             if verbose:
                 acceptance_fraction = np.mean(sampler.acceptance_fraction)
                 print(f"Mean acceptance fraction: {acceptance_fraction:.3f}")
@@ -201,11 +193,11 @@ class MCMCModel:
                     print("Warning: Acceptance fraction outside optimal range (0.2-0.8)")
 
             return sampler
-            
+
         except Exception as ex:
             print(f"MCMC sampling failed: {ex}")
             return None
-
+              
     def get_best_parameters(self, sampler: emcee.EnsembleSampler) -> np.ndarray:
         """Extract parameters with highest posterior probability.
         
@@ -221,20 +213,24 @@ class MCMCModel:
         Raises:
             ValueError: If sampler contains no valid samples
         """
-        if sampler.flatchain.shape[0] == 0:
+        flat_samples = sampler.get_chain(flat=True)
+        if flat_samples is None:
             raise ValueError("Sampler contains no samples")
-            
-        # Find sample with highest log-posterior probability
-        flat_samples = sampler.flatchain
-        flat_lnprob = sampler.flatlnprobability
-        
+
+        flat_lnprob = sampler.get_log_prob(flat=True)
+        if flat_lnprob is None:
+            raise ValueError("Sampler contains no log-probability values")
+
+        if flat_samples.shape[0] == 0:
+            raise ValueError("Sampler contains no samples")
+
         if len(flat_lnprob) == 0 or not np.any(np.isfinite(flat_lnprob)):
             raise ValueError("No finite log-probability values found")
-            
+
         best_idx = np.argmax(flat_lnprob)
         best_params = flat_samples[best_idx]
-        
-        return best_params
+
+        return best_params    
 
     def get_parameter_statistics(self, sampler: emcee.EnsembleSampler) -> dict:
         """Calculate parameter statistics from MCMC chains.
@@ -250,7 +246,9 @@ class MCMCModel:
             - 'uncertainties': 16th-84th percentile uncertainties
             - 'percentiles': Full percentile arrays (16th, 50th, 84th)
         """
-        flat_samples = sampler.flatchain
+        flat_samples = sampler.get_chain(flat=True)
+        if flat_samples is None:
+            raise ValueError("Sampler contains no samples")
         
         # Calculate percentiles for each parameter (16%, 50%, 84% ≈ ±1σ for Gaussian)
         percentiles = np.percentile(flat_samples, [16, 50, 84], axis=0)
