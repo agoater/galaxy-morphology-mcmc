@@ -146,7 +146,7 @@ Three primary parameters are fitted:
 ### Results Directory
 - `parameters_[halo].csv`: Best-fit parameters for each rotation
 - `parameter_statistics_[halo].csv`: Statistical summary across rotations
-- `analysis_summary_[halo].txt`: Human-readable analysis report
+- `analysis_summary_[halo].txt`: Analysis report
 - `mcmc_chain_rotation_XXX_[halo].csv`: Full MCMC chains (optional)
 
 ### Plots Directory
