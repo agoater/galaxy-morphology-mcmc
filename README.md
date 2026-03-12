@@ -8,7 +8,6 @@ A comprehensive Python toolkit for analyzing galaxy morphology using Bayesian MC
 - **Multiple Orientation Sampling**: Analyses galaxies from random viewing angles to assess morphological robustness
 - **Parallel Processing**: Efficient multiprocessing implementation for handling large datasets
 - **Publication-Quality Visualisations**: Generates corner plots, contour maps, and statistical summaries
-- **Comprehensive Output**: CSV exports, statistical analysis, and human-readable reports
 - **Modular Design**: Clean, well-documented codebase following best practices
 - **Automated Setup**: Bash scripts for easy environment management and analysis execution
 
