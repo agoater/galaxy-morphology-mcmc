@@ -130,8 +130,8 @@ Where:
 ### MCMC Parameter Estimation
 
 Three primary parameters are fitted:
-1. **Ellipticity (e)**: Shape parameter [0, 1), where 0=circular, approaching 1=linear
-2. **Position Angle (θ)**: Orientation in degrees [-90°, 90°)  
+1. **Ellipticity (e)**: Shape parameter [0, 1], where 0=circular, approaching 1=linear
+2. **Position Angle (θ)**: Orientation in degrees [-90°, 90°]  
 3. **Half-light Radius (r_h)**: Scale length in kpc
 
 ### Multi-Orientation Analysis
