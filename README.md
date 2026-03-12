@@ -1,6 +1,6 @@
 # Galaxy Morphology Analysis with MCMC
 
-A comprehensive Python toolkit for analyzing galaxy morphology using Bayesian MCMC fitting of elliptical exponential surface brightness profiles. This package processes cosmological simulation data to extract robust morphological parameters through multiple random orientation sampling.
+A comprehensive Python toolkit for analyzing galaxy morphology using Bayesian MCMC fitting of elliptical exponential surface brightness profiles. This package processes cosmological simulation data to extract morphological parameters through multiple random orientation sampling.
 
 ## Features
 
@@ -9,7 +9,7 @@ A comprehensive Python toolkit for analyzing galaxy morphology using Bayesian MC
 - **Parallel Processing**: Efficient multiprocessing implementation for handling large datasets
 - **Publication-Quality Visualisations**: Generates corner plots, contour maps, and statistical summaries
 - **Modular Design**: Clean, well-documented codebase following best practices
-- **Automated Setup**: Bash scripts for easy environment management and analysis execution
+- **Automated Setup**: Bash scripts for easy environment management and analysis executi
 
 ## Installation
 
