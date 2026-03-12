@@ -5,7 +5,7 @@ A comprehensive Python toolkit for analyzing galaxy morphology using Bayesian MC
 ## Features
 
 - **Bayesian Parameter Estimation**: Uses `emcee` for robust MCMC fitting of galaxy surface brightness profiles
-- **Multiple Orientation Sampling**: Analyzes galaxies from random viewing angles to assess morphological robustness
+- **Multiple Orientation Sampling**: Analyses galaxies from random viewing angles to assess morphological robustness
 - **Parallel Processing**: Efficient multiprocessing implementation for handling large datasets
 - **Publication-Quality Visualizations**: Generates corner plots, contour maps, and statistical summaries
 - **Comprehensive Output**: CSV exports, statistical analysis, and human-readable reports
